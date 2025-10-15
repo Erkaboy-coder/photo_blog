@@ -3,7 +3,7 @@ from .models import Post
 from .forms import PostForm
 
 def blog_list(request):
-    posts = Post.objects.all().order_by('-created_at')
+    posts = Post.objects.all()
     form = PostForm()
     return render(request, 'blog_list.html', {'posts': posts, 'form': form})
 

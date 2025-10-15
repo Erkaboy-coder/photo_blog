@@ -1,44 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <title>Mini Photo Blog</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8fafc;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #007bff, #6610f2);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-        }
-        .card {
-            border: none;
-            transition: transform 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: scale(1.02);
-        }
-        .card img {
-            height: 250px;
-            object-fit: cover;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-        footer {
-            margin-top: 60px;
-            padding: 30px 0;
-            background: #212529;
-            color: #ccc;
-        }
-        .modal-header {
-            background: #007bff;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Mini Photo Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --grad: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    }
+    body{background: #f6f8fb;}
+    .navbar{
+      background: var(--grad);
+      backdrop-filter: saturate(140%) blur(6px);
+    }
+    .navbar-brand{font-weight:800; letter-spacing:.3px; color:#fff!important}
+    .glass-card{
+      border: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 24px rgba(0,0,0,.06);
+      transition: box-shadow .25s ease, transform .25s ease;
+      background: #fff;
+    }
+    .glass-card:hover{
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+    }
+    .card-img-top{
+      height: 260px; object-fit: cover;
+    }
+    .reveal{opacity:0; transform: translateY(16px); transition: all .5s ease;}
+    .reveal.show{opacity:1; transform: none;}
+    .fab-upload{
+      position: fixed; right: 18px; bottom: 18px; z-index: 1040;
+      border-radius: 999px; padding: 12px 18px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      background: var(--grad); color:#fff; border:0;
+    }
+    .fab-upload:hover{filter: brightness(1.05);}
+    .modal-header{background: var(--grad); color:#fff;}
+    footer{margin-top: 64px; padding: 28px 0; background:#111; color:#bfc6d1;}
+    .brand-mark{opacity:.9}
+  </style>
 </head>
 <body>
 
@@ -46,7 +50,10 @@
 <nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
     <a class="navbar-brand" href="/">🖼 Mini Photo Blog</a>
-    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload Post</button>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button id="themeToggle" class="btn btn-outline-light btn-sm">Dark</button>
+      <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload Post</button>
+    </div>
   </div>
 </nav>
 
@@ -56,23 +63,24 @@
     <div class="modal-content shadow">
       <div class="modal-header">
         <h5 class="modal-title" id="uploadModalLabel">📤 New Photo Post</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form method="POST" enctype="multipart/form-data" action="{% url 'upload_post' %}">
         <div class="modal-body">
           {% csrf_token %}
           <div class="mb-3">
-              <label class="form-label">Title</label>
-              {{ form.title }}
+            <label class="form-label">Title</label>
+            {{ form.title }}
           </div>
           <div class="mb-3">
-              <label class="form-label">Description</label>
-              {{ form.description }}
+            <label class="form-label">Description</label>
+            {{ form.description }}
           </div>
-          <div class="mb-3">
-              <label class="form-label">Image</label>
-              {{ form.image }}
+          <div class="mb-1">
+            <label class="form-label">Image</label>
+            {{ form.image }}
           </div>
+          <small class="text-muted">JPEG/PNG tavsiya etiladi. 5MB gacha.</small>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Upload</button>
@@ -83,30 +91,93 @@
 </div>
 
 <!-- ✅ Posts Grid -->
-<div class="container mt-5">
+<div class="container my-5">
   <div class="row g-4">
     {% for post in posts %}
-    <div class="col-md-4 col-sm-6">
-      <div class="card shadow-sm">
-        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
-        <div class="card-body">
-          <h5 class="card-title">{{ post.title }}</h5>
-          <p class="card-text text-muted small mb-2">{{ post.created_at|date:"d M Y, H:i" }}</p>
-          <p class="card-text">{{ post.description|truncatechars:100 }}</p>
+      <div class="col-xl-3 col-lg-4 col-md-6 reveal">
+        <div class="card glass-card">
+          <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy"
+               data-full="{{ post.image.url }}" data-title="{{ post.title }}" data-description="{{ post.description|escape }}" style="cursor: zoom-in;">
+          <div class="card-body">
+            <h5 class="card-title mb-1">{{ post.title }}</h5>
+            <p class="text-muted small mb-2">{{ post.created_at|date:"d M Y, H:i" }}</p>
+            <p class="card-text mb-0">{{ post.description|truncatechars:100 }}</p>
+          </div>
         </div>
       </div>
-    </div>
     {% empty %}
-    <p class="text-center text-muted">No posts yet. Click “Upload Post” to add your first photo.</p>
+      <div class="col-12">
+        <div class="text-center py-5">
+          <h5 class="mb-2">Hozircha post yo‘q</h5>
+          <p class="text-muted">“Upload Post” tugmasini bosib birinchi rasmingizni qo‘shing.</p>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload Post</button>
+        </div>
+      </div>
     {% endfor %}
   </div>
 </div>
 
-<!-- ✅ Footer -->
+<!-- ✅ Floating Upload Button -->
+<button class="fab-upload" data-bs-toggle="modal" data-bs-target="#uploadModal">＋ Upload</button>
+
+<!-- ✅ Lightbox Modal -->
+<div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content border-0">
+      <div class="modal-body p-0">
+        <div class="row g-0">
+          <div class="col-lg-8">
+            <img id="lightboxImg" src="" alt="" class="w-100" style="max-height:80vh; object-fit:contain; background:#000;">
+          </div>
+          <div class="col-lg-4 p-4">
+            <h5 id="lightboxTitle" class="mb-2"></h5>
+            <p id="lightboxDesc" class="text-muted"></p>
+            <button type="button" class="btn btn-outline-secondary mt-2" data-bs-dismiss="modal">Yopish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="text-center">
-    <p>Made with ❤️ by <b>Erkaboy</b> | Django + AWS S3 + PostgreSQL</p>
+  <p class="mb-0 brand-mark">Made with ❤️ by <b>Erkaboy</b> — Django · AWS S3 · PostgreSQL</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% verbatim %}
+<script>
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+  }, {threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Lightbox rasm ochish
+  const lbModal = new bootstrap.Modal('#lightboxModal');
+  document.addEventListener('click', e => {
+    const img = e.target.closest('.card-img-top');
+    if (!img) return;
+    document.getElementById('lightboxImg').src = img.dataset.full;
+    document.getElementById('lightboxTitle').textContent = img.dataset.title;
+    document.getElementById('lightboxDesc').textContent = img.dataset.description;
+    lbModal.show();
+  });
+
+  // Dark/Light theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  function setTheme(mode){
+    document.documentElement.setAttribute('data-bs-theme', mode);
+    themeToggle.textContent = (mode === 'dark') ? 'Light' : 'Dark';
+    document.body.style.background = (mode === 'dark') ? '#0b0f14' : '#f6f8fb';
+  }
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    setTheme(isDark ? 'light' : 'dark');
+  });
+</script>
+{% endverbatim %}
+
 </body>
 </html>
