@@ -1,0 +1,85 @@
+# ==========================
+# Django project ignore file
+# ==========================
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.Python
+
+# Environment variables
+.env
+*.env
+
+# Django specific
+db.sqlite3
+media/
+staticfiles/
+static_root/
+static_cdn/
+tmp/
+logs/
+
+# AWS and credentials
+*.pem
+*.key
+*.crt
+*.csr
+*.bak
+aws_credentials.json
+
+# IDE / Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# pytest / coverage / mypy
+.pytest_cache/
+.coverage
+.tox/
+.mypy_cache/
+htmlcov/
+
+# Node / front-end stuff (if you later add React or JS)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Docker / Compose (if used)
+*.pid
+*.pid.lock
+*.log
+*.db-journal
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Gunicorn / Nginx
+*.sock
+supervisord.log
+supervisord.pid
+
+# Backup files
+*.bak
+*.tmp
+*.old
+*.save
